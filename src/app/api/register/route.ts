@@ -24,11 +24,15 @@ export async function POST(req: Request) {
     }
 
     // Fetch dynamic settings from DB
-    // @ts-ignore - Prisma 5 might need a reload in TS server
+    // @ts-ignore
     let settings = await prisma.settings.findFirst();
     if (!settings) {
-      // Default to Riyadh if no settings record exists yet
-      settings = { officeLat: 24.7136, officeLng: 46.6753, maxDistance: 500 } as any;
+      settings = { 
+        officeLat: 24.7136, 
+        officeLng: 46.6753, 
+        maxDistance: 500,
+        webhookUrl: "" 
+      } as any;
     }
 
     const OFFICE_LAT = settings?.officeLat || 24.7136;
@@ -64,9 +68,11 @@ export async function POST(req: Request) {
 
     // Webhook Trigger for Registration
     // @ts-ignore
-    if (settings?.webhookUrl) {
+    if (settings && settings.webhookUrl) {
+      console.log(`[Webhook] Triggering Registration for: ${item.name} -> ${settings.webhookUrl}`);
       try {
-        fetch(settings.webhookUrl, {
+        // Await the fetch to ensure it completes before sending the response
+        await fetch(settings.webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -80,9 +86,10 @@ export async function POST(req: Request) {
             },
             timestamp: new Date().toISOString()
           })
-        }).catch(err => console.error("Registration Webhook Error:", err));
-      } catch (e) {
-        console.error("Webhook call failed silently:", e);
+        });
+        console.log("[Webhook] Sent successfully");
+      } catch (e: any) {
+        console.error("[Webhook] Call failed:", e.message);
       }
     }
 

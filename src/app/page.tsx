@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { User, Hash, Clock, CheckCircle2, XCircle, SkipForward, Phone, Loader2, RefreshCw, Bell, MonitorPlay, QrCode, Settings as SettingsIcon, Save, MapPin, Trash2, Download, X } from "lucide-react";
+import { User, Hash, Clock, CheckCircle2, XCircle, SkipForward, Phone, Loader2, RefreshCw, Bell, MonitorPlay, QrCode, Settings as SettingsIcon, Save, MapPin, Trash2, Download, X, LogOut } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { 
@@ -132,6 +132,12 @@ export default function StaffDashboard() {
   const playPreview = (url: string) => {
     const audio = new Audio(url);
     audio.play().catch(() => alert("يجب التفاعل مع الصفحة أولاً لتشغيل الصوت"));
+  };
+
+  const handleLogout = async () => {
+    if (!confirm("هل تريد تسجيل الخروج؟")) return;
+    await fetch("/api/auth/login", { method: "DELETE" });
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -270,6 +276,15 @@ export default function StaffDashboard() {
           </div>
           <button className="btn btn-outline" onClick={fetchQueue} disabled={loading} style={{ background: "rgba(0,0,0,0.03)" }} title="تحديث البيانات">
             <RefreshCw className={loading ? "animate-spin" : ""} size={18} />
+          </button>
+          
+          <button 
+            className="btn btn-outline" 
+            onClick={handleLogout} 
+            title="تسجيل الخروج"
+            style={{ color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
+          >
+            <LogOut size={18} />
           </button>
         </div>
       </div>
