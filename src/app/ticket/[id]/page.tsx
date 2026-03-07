@@ -66,7 +66,7 @@ export default function TicketPage({ params }: { params: Promise<{ id: string }>
     return (
       <div className="container text-center">
         <h1>الرقم غير موجود</h1>
-        <button className="btn btn-outline" onClick={() => router.push("/")}>
+        <button className="btn btn-outline" onClick={() => router.push("/register")}>
           العودة للتسجيل
         </button>
       </div>
@@ -125,7 +125,7 @@ export default function TicketPage({ params }: { params: Promise<{ id: string }>
         </button>
       )}
 
-      <button className="btn btn-outline" style={{ width: "100%" }} onClick={() => router.push("/")}>
+      <button className="btn btn-outline" style={{ width: "100%" }} onClick={() => router.push("/register")}>
         <ArrowRight size={18} /> العودة للرئيسية
       </button>
 
