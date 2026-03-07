@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model QueueItem {
+  id           Int      @id @default(autoincrement())
+  queueNumber  String
+  name         String
+  phone        String
+  status       String   @default("WAITING") // WAITING, CALLED, DONE, CANCELLED, SKIPPED
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([phone, createdAt])
+}
+
+model Settings {
+  id          Int      @id @default(1)
+  officeLat   Float    @default(24.7136)
+  officeLng   Float    @default(46.6753)
+  maxDistance Int      @default(500) // meters
+  bellUrl     String   @default("https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3")
+  webhookUrl  String?  @default("")
+  updatedAt   DateTime @updatedAt
+}
