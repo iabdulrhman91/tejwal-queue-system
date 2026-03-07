@@ -109,8 +109,12 @@ export default function TicketPage({ params }: { params: Promise<{ id: string }>
           <div style={{ fontSize: "1.5rem", fontWeight: 800 }}>{item.nowServing}</div>
         </div>
         <div style={{ borderRight: "1px solid var(--card-border)" }}>
-          <div className="label">موقع الفرع</div>
-          <div style={{ fontSize: "1.1rem" }}>المكتب الرئيسي</div>
+          <div className="label">حالة الدور</div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 700, color: item.status === "CALLED" ? "var(--success)" : "var(--accent)" }}>
+            {item.status === "CALLED" 
+              ? "تفضل للمكتب" 
+              : (item.waitingCount === 0 ? "أنت التالي" : `دورك بعد ${item.waitingCount} أشخاص`)}
+          </div>
         </div>
       </div>
 

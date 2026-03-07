@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
     if (distance > MAX_DISTANCE) {
       return NextResponse.json(
-        { error: `يجب أن تكون داخل نطاق الموظف للتسجيل (المسافة الحالية: ${Math.round(distance)} متر)` },
+        { error: `يجب أن تكون داخل نطاق المكتب للتسجيل (المسافة الحالية: ${Math.round(distance)} متر)` },
         { status: 403 }
       );
     }

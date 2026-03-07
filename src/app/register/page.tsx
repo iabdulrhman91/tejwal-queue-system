@@ -5,7 +5,7 @@ import { User, Phone, MapPin, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", phone: "" });
+  const [form, setForm] = useState({ name: "", phone: "" }); // Only store the 9 digits in state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -47,6 +47,14 @@ export default function RegisterPage() {
       setError("يرجى تفعيل الموقع للتسجيل");
       return;
     }
+    
+    // Validate phone number: must be exactly 9 digits
+    const phoneRegex = /^\d{9}$/;
+    if (!phoneRegex.test(form.phone)) {
+      setError("يرجى إدخال 9 أرقام صحيحة بعد رمز الدولة");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -56,6 +64,7 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           ...form, 
+          phone: "966" + form.phone,
           latitude: location.lat, 
           longitude: location.lng 
         }),
@@ -81,13 +90,10 @@ export default function RegisterPage() {
 
   return (
     <main className="container animate-fade">
-      <div className="text-center" style={{ marginBottom: "2rem" }}>
-        <h1 className="h1">Tejwal Fingerprint</h1>
-        <p style={{ color: "var(--muted)" }}>نظام تنظيم طابور البصمة</p>
-      </div>
+      <div style={{ marginTop: "4rem" }}></div>
 
       <div className="card">
-        <h2 style={{ marginBottom: "1.5rem", textAlign: "center", fontSize: "1.2rem" }}>تسجيل طلب انتظار</h2>
+        <h2 style={{ marginBottom: "2rem", textAlign: "center", fontSize: "1.5rem", fontWeight: 800, color: "var(--primary)" }}>تسجيل طلب انتظار لبصمة الشنغن</h2>
 
         {error && (
           <div
@@ -109,16 +115,66 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "1rem" }}>
             <label className="label">
-              <User size={14} style={{ marginLeft: "4px" }} /> الاسم الكامل
+              <User size={14} style={{ marginLeft: "4px" }} /> الاسم الثنائي
             </label>
-            <input type="text" placeholder="فايز بن علي..." required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} disabled={loading} />
+            <input 
+              type="text" 
+              placeholder="" 
+              required 
+              maxLength={20}
+              value={form.name} 
+              onChange={(e) => setForm({ ...form, name: e.target.value })} 
+              disabled={loading} 
+            />
           </div>
 
           <div style={{ marginBottom: "1.5rem" }}>
             <label className="label">
               <Phone size={14} style={{ marginLeft: "4px" }} /> رقم الجوال
             </label>
-            <input type="tel" placeholder="05xxxxxxxx" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} disabled={loading} />
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              direction: "ltr", // Fixed '966' is on the left
+              background: "var(--background)",
+              border: "1px solid var(--card-border)",
+              borderRadius: "var(--radius)",
+              overflow: "hidden"
+            }}>
+              <span style={{ 
+                padding: "0 1rem", 
+                height: "100%", 
+                display: "flex", 
+                alignItems: "center", 
+                background: "rgba(0,0,0,0.05)", 
+                fontWeight: 700,
+                color: "var(--muted)",
+                borderRight: "1px solid var(--card-border)"
+              }}>
+                966
+              </span>
+              <input 
+                type="tel" 
+                placeholder="5xxxxxxxx" 
+                required 
+                value={form.phone} 
+                onFocus={(e) => {
+                  // Ensure formatting is correct on focus
+                }}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "").slice(0, 9);
+                  setForm({ ...form, phone: val });
+                }} 
+                disabled={loading} 
+                style={{ 
+                  border: "none", 
+                  margin: 0, 
+                  borderRadius: 0, 
+                  textAlign: "left",
+                  background: "transparent"
+                }}
+              />
+            </div>
           </div>
 
           <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={loading || locLoading}>

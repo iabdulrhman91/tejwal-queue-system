@@ -6,6 +6,9 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const item = await prisma.queueItem.findUnique({
       where: {
         id: parseInt(id),
@@ -16,19 +19,30 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ error: "الرقم غير موجود" }, { status: 404 });
     }
 
-    // Get current serving number for ticket page
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     const nowServing = await prisma.queueItem.findFirst({
       where: {
         createdAt: { gte: today },
         status: "CALLED",
       },
-      orderBy: { updatedAt: "desc" }, // Last called
+      orderBy: { updatedAt: "desc" },
     });
 
-    return NextResponse.json({ ...item, nowServing: nowServing?.queueNumber || "--" });
+    // Get currently waiting count before this item
+    const waitingCount = await prisma.queueItem.count({
+      where: {
+        status: "WAITING",
+        createdAt: {
+          gte: today,
+          lt: item.createdAt,
+        },
+      },
+    });
+
+    return NextResponse.json({ 
+      ...item, 
+      nowServing: nowServing?.queueNumber || "--",
+      waitingCount 
+    });
   } catch (error: any) {
     console.error("Queue Detail API Error:", error);
     return NextResponse.json({ error: error.message || "حدث خطأ في الخادم" }, { status: 500 });

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { User, Hash, Clock, CheckCircle2, XCircle, SkipForward, Phone, Loader2, RefreshCw, Bell, MonitorPlay, QrCode, Settings as SettingsIcon, Save, MapPin, Trash2 } from "lucide-react";
+import { User, Hash, Clock, CheckCircle2, XCircle, SkipForward, Phone, Loader2, RefreshCw, Bell, MonitorPlay, QrCode, Settings as SettingsIcon, Save, MapPin, Trash2, Download, X } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { 
@@ -41,6 +41,15 @@ export default function StaffDashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [settings, setSettings] = useState({ officeLat: 24.7136, officeLng: 46.6753, maxDistance: 500, bellUrl: SOUND_OPTIONS[0].url, webhookUrl: "" });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const registerUrl = `${origin}/register`;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(registerUrl)}`;
 
   const fetchQueue = async () => {
     try {
@@ -204,9 +213,61 @@ export default function StaffDashboard() {
           <a href="/tv" target="_blank" className="btn btn-outline" style={{ fontSize: "0.85rem", gap: "0.4rem" }}>
             <MonitorPlay size={16} /> شاشة العرض
           </a>
-          <a href="/register" target="_blank" className="btn btn-outline" style={{ fontSize: "0.85rem", gap: "0.4rem" }}>
-            <QrCode size={16} /> رابط العملاء
-          </a>
+          <div style={{ position: 'relative' }}>
+            <button 
+              className={`btn ${showQR ? 'btn-primary' : 'btn-outline'}`} 
+              onClick={() => setShowQR(!showQR)}
+              style={{ fontSize: "0.85rem", gap: "0.4rem" }}
+            >
+              <QrCode size={16} /> رابط العملاء
+            </button>
+            
+            {showQR && (
+              <div className="card animate-fade" style={{ 
+                position: 'absolute', 
+                top: '120%', 
+                left: '50%', 
+                transform: 'translateX(-50%)', 
+                zIndex: 100, 
+                width: '320px', 
+                padding: '1.5rem',
+                textAlign: 'center',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+                border: '1px solid var(--accent)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800 }}>رابط تسجيل العملاء</h3>
+                  <X size={18} style={{ cursor: 'pointer', opacity: 0.5 }} onClick={() => setShowQR(false)} />
+                </div>
+                
+                <div style={{ background: 'white', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+                  <img src={qrImageUrl} alt="QR Code" style={{ width: '100%', height: 'auto' }} />
+                </div>
+                
+                <div style={{ fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '1rem', wordBreak: 'break-all', direction: 'ltr' }}>
+                  {registerUrl}
+                </div>
+                
+                <button 
+                  className="btn btn-primary" 
+                  style={{ width: '100%', gap: '0.5rem', fontSize: '0.9rem' }}
+                  onClick={async () => {
+                    const response = await fetch(qrImageUrl);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'schengen-qr-code.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                >
+                  <Download size={16} /> تنزيل الباركود
+                </button>
+              </div>
+            )}
+          </div>
           <button className="btn btn-outline" onClick={fetchQueue} disabled={loading} style={{ background: "rgba(0,0,0,0.03)" }} title="تحديث البيانات">
             <RefreshCw className={loading ? "animate-spin" : ""} size={18} />
           </button>
