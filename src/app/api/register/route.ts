@@ -62,6 +62,30 @@ export async function POST(req: Request) {
       },
     });
 
+    // Webhook Trigger for Registration
+    // @ts-ignore
+    if (settings?.webhookUrl) {
+      try {
+        fetch(settings.webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            event: "CUSTOMER_REGISTERED",
+            customer: {
+              id: item.id,
+              name: item.name,
+              phone: item.phone,
+              queueNumber: item.queueNumber,
+              status: item.status
+            },
+            timestamp: new Date().toISOString()
+          })
+        }).catch(err => console.error("Registration Webhook Error:", err));
+      } catch (e) {
+        console.error("Webhook call failed silently:", e);
+      }
+    }
+
     return NextResponse.json(item);
   } catch (error: any) {
     console.error("Registration Error:", error);
