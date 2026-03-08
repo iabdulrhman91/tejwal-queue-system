@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     // Is registration open?
     if (settings && (settings.isOpen === false || (settings.isOpen as any) == 0)) {
-      return NextResponse.json({ error: "عذراً، التسجيل مغلق حالياً. سيفتح الرابط قبل الموعد بساعة واحدة فقط مع ضرورة تواجدك في الموقع." }, { status: 403 });
+      return NextResponse.json({ error: "عذراً، التسجيل مغلق حالياً. سيفتح الرابط قبل الموعد بساعة واحدة مع ضرورة تواجدك في الموقع." }, { status: 403 });
     }
 
     // Is within office radius?
