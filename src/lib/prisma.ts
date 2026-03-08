@@ -13,7 +13,7 @@ if (typeof window === "undefined") {
 }
 
 // Standard fallback if DATABASE_URL is missing
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
+const dbUrl = process.env.DATABASE_URL || "file:/app/data/dev.db";
 
 export const prisma =
   globalForPrisma.prisma ??
