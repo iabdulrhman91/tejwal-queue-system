@@ -110,8 +110,11 @@ export default function StaffDashboard() {
     }
   };
 
-  const handleSaveSettings = async (updatedSettings?: any) => {
-    const toSave = updatedSettings || settings;
+  const handleSaveSettings = async (manualSettings?: any) => {
+    // Safety: Ensure we only save a valid settings object, never a browser event or element
+    const isPlainSettings = manualSettings && typeof manualSettings === 'object' && 'officeLat' in manualSettings;
+    const toSave = isPlainSettings ? manualSettings : settings;
+    
     setSavingSettings(true);
     try {
       const res = await fetch(`/api/settings?t=${Date.now()}`, {
@@ -121,7 +124,7 @@ export default function StaffDashboard() {
         cache: "no-store"
       });
       if (res.ok) {
-        if (!updatedSettings) {
+        if (!isPlainSettings) {
           alert("تم حفظ الإعدادات بنجاح");
           setShowSettings(false);
         }
@@ -311,7 +314,7 @@ export default function StaffDashboard() {
                 <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
                    <button 
                     className={`btn ${settings.isOpen ? 'btn-danger' : 'btn-success'}`} 
-                    onClick={handleToggleRegistration}
+                    onClick={() => handleToggleRegistration()}
                     style={{ width: '100%', fontSize: '0.85rem', height: '38px' }}
                     disabled={savingSettings}
                   >
