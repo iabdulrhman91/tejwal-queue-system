@@ -147,7 +147,9 @@ export default function RegisterPage() {
       <div style={{ marginTop: "4rem" }}></div>
 
       <div className="card">
-        <h2 style={{ marginBottom: "2rem", textAlign: "center", fontSize: "1.5rem", fontWeight: 800, color: "var(--primary)" }}>تسجيل طلب انتظار لبصمة الشنغن</h2>
+        <h2 style={{ marginBottom: "2rem", textAlign: "center", fontSize: "1.5rem", fontWeight: 800, color: "var(--primary)" }}>
+          {process.env.NEXT_PUBLIC_REGISTER_TITLE || "تسجيل طلب انتظار لبصمة الشنغن"}
+        </h2>
 
         {error && (
           <div
