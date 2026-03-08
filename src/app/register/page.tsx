@@ -130,7 +130,10 @@ export default function RegisterPage() {
             <MapPin size={40} />
           </div>
           <h1 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "1rem", color: "var(--primary)" }}>عذراً، التسجيل مغلق حالياً</h1>
-          <p style={{ fontSize: "1.1rem", color: "var(--muted)", lineHeight: 1.6 }}>لن يفتح الموقع الا قبل الموعد بساعة</p>
+          <div style={{ fontSize: "1.1rem", color: "var(--muted)", lineHeight: 1.8, textAlign: "right", display: "inline-block", margin: "0 auto" }}>
+            <p>• سيفتح الرابط قبل الموعد بساعة واحدة فقط.</p>
+            <p>• التسجيل يتطلب وجودك داخل الموقع الجغرافي للمكتب.</p>
+          </div>
           <div style={{ marginTop: "2rem", paddingTop: "2rem", borderTop: "1px solid var(--card-border)" }}>
             <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>شكراً لتفهمكم</p>
           </div>
