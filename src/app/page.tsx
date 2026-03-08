@@ -39,7 +39,7 @@ export default function StaffDashboard() {
   
   // Settings state
   const [showSettings, setShowSettings] = useState(false);
-  const [settings, setSettings] = useState({ officeLat: 24.7136, officeLng: 46.6753, maxDistance: 500, bellUrl: SOUND_OPTIONS[0].url, webhookUrl: "" });
+  const [settings, setSettings] = useState<any>({ officeLat: 24.7136, officeLng: 46.6753, maxDistance: 500, bellUrl: SOUND_OPTIONS[0].url, webhookUrl: "", isOpen: true });
   const [savingSettings, setSavingSettings] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [origin, setOrigin] = useState("");
@@ -92,15 +92,17 @@ export default function StaffDashboard() {
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
+        console.log("Staff Dashboard: Settings received from server:", data);
         setSettings({
           officeLat: data.officeLat,
           officeLng: data.officeLng,
           maxDistance: data.maxDistance,
           bellUrl: data.bellUrl || SOUND_OPTIONS[0].url,
-          webhookUrl: data.webhookUrl || ""
+          webhookUrl: data.webhookUrl || "",
+          isOpen: data.isOpen === true || data.isOpen === 1
         });
       }
     } catch (err) {
@@ -108,25 +110,40 @@ export default function StaffDashboard() {
     }
   };
 
-  const handleSaveSettings = async () => {
+  const handleSaveSettings = async (updatedSettings?: any) => {
+    const toSave = updatedSettings || settings;
     setSavingSettings(true);
     try {
-      const res = await fetch("/api/settings", {
+      const res = await fetch(`/api/settings?t=${Date.now()}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings)
+        body: JSON.stringify(toSave),
+        cache: "no-store"
       });
       if (res.ok) {
-        alert("تم حفظ الإعدادات بنجاح");
-        setShowSettings(false);
+        if (!updatedSettings) {
+          alert("تم حفظ الإعدادات بنجاح");
+          setShowSettings(false);
+        }
+        await fetchSettings(); // Force refresh state from server truth
       } else {
-        throw new Error("فشل الحفظ");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.details || errData.error || "فشل الحفظ");
       }
-    } catch (err) {
-      alert("حدث خطأ أثناء الحفظ");
+    } catch (err: any) {
+      console.error("Save Settings Error:", err);
+      alert(`حدث خطأ أثناء الحفظ: ${err.message}`);
     } finally {
       setSavingSettings(false);
     }
+  };
+
+  const handleToggleRegistration = async () => {
+    const currentStatus = settings.isOpen === true || settings.isOpen === 1;
+    const newStatus = !currentStatus;
+    const newSettings = { ...settings, isOpen: newStatus };
+    setSettings(newSettings);
+    await handleSaveSettings(newSettings);
   };
 
   const playPreview = (url: string) => {
@@ -179,6 +196,7 @@ export default function StaffDashboard() {
           border: "1px solid var(--card-border)",
         }}
       >
+        {/* Right Side: Title and Stats */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <div
             style={{
@@ -196,11 +214,26 @@ export default function StaffDashboard() {
           </div>
           <div>
             <h1 style={{ fontSize: "1.5rem", fontWeight: 800 }}>لوحة الموظف</h1>
-            <p style={{ color: "var(--muted)", fontSize: "0.8rem" }}>{items.length} مراجعين اليوم</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <p style={{ color: "var(--muted)", fontSize: "0.80rem" }}>{items.length} مراجعين اليوم</p>
+              <div style={{ 
+                fontSize: '0.75rem', 
+                padding: '0.2rem 0.6rem', 
+                borderRadius: '99px', 
+                background: (settings.isOpen === true || settings.isOpen === 1) ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                color: (settings.isOpen === true || settings.isOpen === 1) ? '#22c55e' : '#ef4444',
+                border: (settings.isOpen === true || settings.isOpen === 1) ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(239, 68, 68, 0.2)',
+                fontWeight: 700
+              }}>
+                {(settings.isOpen === true || settings.isOpen === 1) ? 'الرابط مفتوح' : 'الرابط مغلق'}
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div style={{ display: "flex", gap: "0.75rem" }}>
+
+        {/* Left Side: Action Buttons */}
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          
           <button 
             className="btn btn-outline" 
             onClick={handleReset}
@@ -209,6 +242,7 @@ export default function StaffDashboard() {
           >
             {resetting ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />} إنهاء اليوم
           </button>
+
           <button 
             className={`btn ${showSettings ? 'btn-primary' : 'btn-outline'}`} 
             onClick={() => setShowSettings(!showSettings)}
@@ -216,9 +250,11 @@ export default function StaffDashboard() {
           >
             <SettingsIcon size={16} /> الإعدادات
           </button>
+
           <a href="/tv" target="_blank" className="btn btn-outline" style={{ fontSize: "0.85rem", gap: "0.4rem" }}>
             <MonitorPlay size={16} /> شاشة العرض
           </a>
+
           <div style={{ position: 'relative' }}>
             <button 
               className={`btn ${showQR ? 'btn-primary' : 'btn-outline'}`} 
@@ -256,7 +292,7 @@ export default function StaffDashboard() {
                 
                 <button 
                   className="btn btn-primary" 
-                  style={{ width: '100%', gap: '0.5rem', fontSize: '0.9rem' }}
+                  style={{ width: '100%', gap: '0.5rem', fontSize: '0.9rem', marginBottom: '0.75rem' }}
                   onClick={async () => {
                     const response = await fetch(qrImageUrl);
                     const blob = await response.blob();
@@ -271,18 +307,26 @@ export default function StaffDashboard() {
                 >
                   <Download size={16} /> تنزيل الباركود
                 </button>
+
+                <div style={{ borderTop: '1px solid var(--card-border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                   <button 
+                    className={`btn ${settings.isOpen ? 'btn-danger' : 'btn-success'}`} 
+                    onClick={handleToggleRegistration}
+                    style={{ width: '100%', fontSize: '0.85rem', height: '38px' }}
+                    disabled={savingSettings}
+                  >
+                    {savingSettings ? <Loader2 className="animate-spin" size={16} /> : (settings.isOpen ? 'إغلاق التسجيل حالياً' : 'فتح رابط التسجيل')}
+                  </button>
+                </div>
               </div>
             )}
           </div>
-          <button className="btn btn-outline" onClick={fetchQueue} disabled={loading} style={{ background: "rgba(0,0,0,0.03)" }} title="تحديث البيانات">
-            <RefreshCw className={loading ? "animate-spin" : ""} size={18} />
-          </button>
-          
+
           <button 
             className="btn btn-outline" 
             onClick={handleLogout} 
             title="تسجيل الخروج"
-            style={{ color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)" }}
+            style={{ color: "var(--danger)", borderColor: "rgba(239, 68, 68, 0.2)", padding: "0.6rem" }}
           >
             <LogOut size={18} />
           </button>
@@ -327,6 +371,7 @@ export default function StaffDashboard() {
               ))}
             </div>
           </div>
+
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.5rem", marginBottom: "2rem" }}>
             <div>
@@ -393,7 +438,7 @@ export default function StaffDashboard() {
           </div>
           
           <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
-            <button className="btn btn-primary" onClick={handleSaveSettings} disabled={savingSettings} style={{ gap: "0.5rem" }}>
+            <button className="btn btn-primary" onClick={() => handleSaveSettings()} disabled={savingSettings} style={{ gap: "0.5rem" }}>
               {savingSettings ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />} حفظ الإعدادات
             </button>
           </div>

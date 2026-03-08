@@ -10,6 +10,8 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locLoading, setLocLoading] = useState(true);
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(true);
+  const [initLoading, setInitLoading] = useState(true);
 
   const requestLocation = () => {
     setLocLoading(true);
@@ -38,6 +40,20 @@ export default function RegisterPage() {
   };
 
   useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setIsRegistrationOpen(data.isOpen === true || data.isOpen === 1);
+        }
+      } catch (err) {
+        console.error("Error fetching status:", err);
+      } finally {
+        setInitLoading(false);
+      }
+    };
+    checkStatus();
     requestLocation();
   }, []);
 
@@ -87,6 +103,41 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (initLoading) {
+    return (
+      <div className="container text-center" style={{ paddingTop: "10rem" }}>
+        <Loader2 className="animate-spin" size={40} color="var(--accent)" />
+      </div>
+    );
+  }
+
+  if (!isRegistrationOpen) {
+    return (
+      <main className="container animate-fade" style={{ maxWidth: "500px", marginTop: "10rem" }}>
+        <div className="card text-center" style={{ padding: "3rem 2rem" }}>
+          <div style={{ 
+            width: "80px", 
+            height: "80px", 
+            background: "rgba(239, 68, 68, 0.1)", 
+            borderRadius: "50%", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            margin: "0 auto 2rem",
+            color: "var(--danger)"
+          }}>
+            <MapPin size={40} />
+          </div>
+          <h1 style={{ fontSize: "1.8rem", fontWeight: 900, marginBottom: "1rem", color: "var(--primary)" }}>عذراً، التسجيل مغلق حالياً</h1>
+          <p style={{ fontSize: "1.1rem", color: "var(--muted)", lineHeight: 1.6 }}>لن يفتح الموقع الا قبل الموعد بساعة</p>
+          <div style={{ marginTop: "2rem", paddingTop: "2rem", borderTop: "1px solid var(--card-border)" }}>
+            <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>شكراً لتفهمكم</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="container animate-fade">

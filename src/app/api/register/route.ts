@@ -39,6 +39,11 @@ export async function POST(req: Request) {
     const OFFICE_LNG = settings?.officeLng || 46.6753;
     const MAX_DISTANCE = settings?.maxDistance || 500;
 
+    // Is registration open?
+    if (settings && (settings.isOpen === false || settings.isOpen === 0)) {
+      return NextResponse.json({ error: "عذراً، التسجيل مغلق حالياً من قبل الإدارة" }, { status: 403 });
+    }
+
     // Is within office radius?
     const distance = getDistance(latitude, longitude, OFFICE_LAT, OFFICE_LNG);
     if (distance > MAX_DISTANCE) {

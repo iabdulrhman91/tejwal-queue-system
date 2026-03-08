@@ -5,11 +5,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    // Standard Prisma call (Client is now in sync)
     // @ts-ignore
     let settings = await prisma.settings.findFirst();
     
-    // Create default settings if they don't exist
     if (!settings) {
+      console.log("No settings found, creating defaults...");
       // @ts-ignore
       settings = await prisma.settings.create({
         data: {
@@ -18,7 +19,8 @@ export async function GET() {
           officeLng: 46.6753,
           maxDistance: 500,
           bellUrl: "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3",
-          webhookUrl: ""
+          webhookUrl: "",
+          isOpen: true
         }
       });
     }
@@ -26,22 +28,23 @@ export async function GET() {
     return NextResponse.json(settings);
   } catch (error: any) {
     console.error("Settings GET Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "فشل استرجاع الإعدادات" }, { status: 500 });
   }
 }
 
 export async function PATCH(req: Request) {
   try {
     const data = await req.json();
+    console.log("PATCH settings request body:", JSON.stringify(data));
     
-    // Safety check for data values
-    const officeLat = parseFloat(data.officeLat) || 24.7136;
-    const officeLng = parseFloat(data.officeLng) || 46.6753;
-    const maxDistance = parseInt(data.maxDistance) || 500;
-    const bellUrl = data.bellUrl || "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3";
-    const webhookUrl = data.webhookUrl || "";
+    const lat = isNaN(parseFloat(data.officeLat)) ? 24.7136 : parseFloat(data.officeLat);
+    const lng = isNaN(parseFloat(data.officeLng)) ? 46.6753 : parseFloat(data.officeLng);
+    const dist = isNaN(parseInt(data.maxDistance)) ? 500 : parseInt(data.maxDistance);
+    const bell = data.bellUrl || "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3";
+    const web = data.webhookUrl || "";
+    // Handle isOpen correctly
+    const isOpen = data.isOpen === true || data.isOpen === 1 || data.isOpen === "true";
 
-    // Find any existing settings (we only have one row)
     // @ts-ignore
     let settings = await prisma.settings.findFirst();
 
@@ -49,24 +52,26 @@ export async function PATCH(req: Request) {
       // @ts-ignore
       settings = await prisma.settings.update({
         where: { id: settings.id },
-        data: {
-          officeLat,
-          officeLng,
-          maxDistance,
-          bellUrl,
-          webhookUrl,
+        data: { 
+          officeLat: lat, 
+          officeLng: lng, 
+          maxDistance: dist, 
+          bellUrl: bell, 
+          webhookUrl: web, 
+          isOpen 
         },
       });
     } else {
       // @ts-ignore
       settings = await prisma.settings.create({
-        data: {
-          id: 1,
-          officeLat,
-          officeLng,
-          maxDistance,
-          bellUrl,
-          webhookUrl,
+        data: { 
+          id: 1, 
+          officeLat: lat, 
+          officeLng: lng, 
+          maxDistance: dist, 
+          bellUrl: bell, 
+          webhookUrl: web, 
+          isOpen 
         },
       });
     }
@@ -74,7 +79,6 @@ export async function PATCH(req: Request) {
     return NextResponse.json(settings);
   } catch (error: any) {
     console.error("Settings PATCH Error:", error);
-    // Include the error message in the response for better debugging in the UI
     return NextResponse.json({ 
       error: "فشل تحديث الإعدادات", 
       details: error.message 
