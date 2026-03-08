@@ -9,8 +9,8 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
-  title: "Tejwal Fingerprint Queue System",
-  description: "نظام تنظيم طابور البصمة في المكتب",
+  title: process.env.NEXT_PUBLIC_APP_NAME || "Tejwal Fingerprint Queue System",
+  description: process.env.NEXT_PUBLIC_APP_DESC || "نظام تنظيم طابور البصمة في المكتب",
 };
 
 export default function RootLayout({
