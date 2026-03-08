@@ -5,7 +5,15 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // Standard Prisma call (Client is now in sync)
+    // Auto-Migration for Production: Add isOpen column if it doesn't exist
+    try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE Settings ADD COLUMN isOpen INTEGER DEFAULT 1`);
+      console.log("Migration: Added isOpen column to Settings table");
+    } catch (e) {
+      // Column likely already exists, ignore
+    }
+
+    // Standard Prisma call
     // @ts-ignore
     let settings = await prisma.settings.findFirst();
     
@@ -28,7 +36,10 @@ export async function GET() {
     return NextResponse.json(settings);
   } catch (error: any) {
     console.error("Settings GET Error:", error);
-    return NextResponse.json({ error: "فشل استرجاع الإعدادات" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "فشل استرجاع الإعدادات",
+      details: error.message 
+    }, { status: 500 });
   }
 }
 
