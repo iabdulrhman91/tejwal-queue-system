@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const MAX_DISTANCE = settings?.maxDistance || 500;
 
     // Is registration open?
-    if (settings && (settings.isOpen === false || settings.isOpen === 0)) {
+    if (settings && (settings.isOpen === false || (settings.isOpen as any) == 0)) {
       return NextResponse.json({ error: "عذراً، التسجيل مغلق حالياً من قبل الإدارة" }, { status: 403 });
     }
 
