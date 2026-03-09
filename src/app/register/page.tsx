@@ -218,8 +218,19 @@ export default function RegisterPage() {
                   // Ensure formatting is correct on focus
                 }}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, "").slice(0, 9);
-                  setForm({ ...form, phone: val });
+                  const val = e.target.value.replace(/\D/g, "");
+                  
+                  if (val.length > 0 && val[0] !== "5") {
+                    setError("يجب أن يبدأ رقم الجوال بالرقم 5 مباشرة (5xxxxxxxx)");
+                    return;
+                  }
+                  
+                  // Clear error if they start typing correctly
+                  if (error && val[0] === "5") {
+                    setError(null);
+                  }
+
+                  setForm({ ...form, phone: val.slice(0, 9) });
                 }} 
                 disabled={loading} 
                 style={{ 
