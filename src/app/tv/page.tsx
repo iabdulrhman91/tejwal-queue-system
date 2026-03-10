@@ -10,25 +10,19 @@ export default function TVPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [bellUrl, setBellUrl] = useState("https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3");
-  const [tickerMessages, setTickerMessages] = useState<string[]>([
-    "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
-    "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
-    "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
-    "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
-    "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
-    "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
-  ]);
+  const [tickerMessages, setTickerMessages] = useState<string[]>([]);
   const [tickerSpeed, setTickerSpeed] = useState(45);
   const isPlayingRef = useRef(false);
 
 
   const fetchSettings = async () => {
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         if (data.bellUrl) setBellUrl(data.bellUrl);
         if (data.tickerMessages) setTickerMessages(data.tickerMessages);
+        else setTickerMessages([]); // Reset to empty if no messages defined in ENV
         if (data.tickerSpeed) setTickerSpeed(data.tickerSpeed);
       }
 
@@ -217,6 +211,7 @@ export default function TVPage() {
       </div>
 
       {/* Scrolling Ad Ticker (Seamless RTL Loop) */}
+      {tickerMessages.length > 0 && (
       <div 
         style={{ 
           position: "fixed", 
@@ -269,6 +264,7 @@ export default function TVPage() {
           }
         `}</style>
       </div>
+      )}
     </main>
   );
 }

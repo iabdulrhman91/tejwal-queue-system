@@ -39,12 +39,19 @@ export async function GET() {
       .filter(s => s !== "");
 
     const tickerSpeed = parseInt(process.env.TICKER_SPEED || process.env.NEXT_PUBLIC_TICKER_SPEED || "45");
+    
+    console.log("Debug - Ticker Messages from ENV:", tickerMessages);
 
 
     return NextResponse.json({
       ...settings,
       tickerMessages: tickerMessages.length > 0 ? tickerMessages : null,
       tickerSpeed: !isNaN(tickerSpeed) ? tickerSpeed : 45
+    }, {
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache"
+      }
     });
   } catch (error: any) {
     console.error("Settings GET Error:", error);
