@@ -18,7 +18,9 @@ export default function TVPage() {
     "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
     "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
   ]);
+  const [tickerSpeed, setTickerSpeed] = useState(45);
   const isPlayingRef = useRef(false);
+
 
   const fetchSettings = async () => {
     try {
@@ -27,7 +29,9 @@ export default function TVPage() {
         const data = await res.json();
         if (data.bellUrl) setBellUrl(data.bellUrl);
         if (data.tickerMessages) setTickerMessages(data.tickerMessages);
+        if (data.tickerSpeed) setTickerSpeed(data.tickerSpeed);
       }
+
     } catch (err) {
       console.error("TV Settings Fetch Error:", err);
     }
@@ -232,12 +236,13 @@ export default function TVPage() {
         <div className="ticker-inner" style={{
           display: "flex",
           width: "max-content",
-          animation: "ticker-rtl 45s linear infinite",
+          animation: `ticker-rtl ${tickerSpeed}s linear infinite`,
           fontSize: "1.8rem",
           fontWeight: 800,
           color: "white",
           letterSpacing: "0.02em"
         }}>
+
           {/* We repeat the content to create a seamless loop */}
           {[1, 2, 3].map((loop) => (
             <div key={loop} style={{ display: "flex", alignItems: "center" }}>

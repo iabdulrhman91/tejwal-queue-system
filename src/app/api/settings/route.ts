@@ -38,9 +38,13 @@ export async function GET() {
       .map(s => s.trim())
       .filter(s => s !== "");
 
+    const tickerSpeed = parseInt(process.env.TICKER_SPEED || process.env.NEXT_PUBLIC_TICKER_SPEED || "45");
+
+
     return NextResponse.json({
       ...settings,
-      tickerMessages: tickerMessages.length > 0 ? tickerMessages : null
+      tickerMessages: tickerMessages.length > 0 ? tickerMessages : null,
+      tickerSpeed: !isNaN(tickerSpeed) ? tickerSpeed : 45
     });
   } catch (error: any) {
     console.error("Settings GET Error:", error);
