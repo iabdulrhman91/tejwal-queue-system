@@ -203,7 +203,7 @@ export default function TVPage() {
         </section>
       </div>
 
-      {/* Scrolling Ad Ticker (Seamless Infinite Loop) */}
+      {/* Scrolling Ad Ticker (Seamless Infinite Loop Fix) */}
       <div 
         style={{ 
           position: "fixed", 
@@ -216,19 +216,20 @@ export default function TVPage() {
           padding: "1.2rem 0",
           overflow: "hidden",
           zIndex: 100,
+          direction: "ltr", // Force LTR for the ticker logic to be consistent
           boxShadow: "0 -10px 50px rgba(0,0,0,0.6)"
         }}
       >
-        <div className="ticker-container" style={{
+        <div className="ticker-inner" style={{
           display: "flex",
           width: "max-content",
-          animation: "ticker-seamless 60s linear infinite",
+          animation: "ticker-infinite 60s linear infinite",
           fontSize: "2.2rem",
           fontWeight: 850,
           color: "white"
         }}>
-          {/* We repeat the content twice to create a seamless loop */}
-          {[1, 2].map((loop) => (
+          {/* We repeat the content to create a seamless loop */}
+          {[1, 2, 3].map((loop) => (
             <div key={loop} style={{ display: "flex", alignItems: "center" }}>
               {[
                 "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
@@ -238,7 +239,7 @@ export default function TVPage() {
                 "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
                 "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
               ].map((msg, i) => (
-                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem" }}>
+                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem", direction: "rtl" }}>
                   {msg}
                   <span style={{ color: "var(--accent)", fontSize: "2.5rem" }}>★</span>
                 </span>
@@ -247,12 +248,12 @@ export default function TVPage() {
           ))}
         </div>
         <style jsx>{`
-          .ticker-container {
+          .ticker-inner {
             will-change: transform;
           }
-          @keyframes ticker-seamless {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+          @keyframes ticker-infinite {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-33.33%, 0, 0); }
           }
         `}</style>
       </div>
