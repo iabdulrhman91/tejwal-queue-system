@@ -115,11 +115,9 @@ export default function TVPage() {
   // Messages are now managed by state for real-time updates
 
   return (
-    <main className="tv-display">
+    <main className="tv-display" style={{ paddingTop: "6.5rem" }}>
       <audio ref={audioRef} src={bellUrl} preload="auto" />
 
-      {/* Simplified Space */}
-      <div style={{ marginBottom: "2rem" }}></div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "2rem", flex: 1 }}>
         {/* Serving Section */}
@@ -218,34 +216,39 @@ export default function TVPage() {
       <div 
         style={{ 
           position: "fixed", 
-          bottom: 0, 
+          top: 0, 
           left: 0, 
           right: 0, 
-          background: "rgba(0,0,0,0.92)", 
-          backdropFilter: "blur(20px)",
-          borderTop: "4px solid var(--accent)",
-          padding: "1.2rem 0",
+          background: "linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 0.95) 100%)", 
+          backdropFilter: "blur(15px)",
+          borderBottom: "4px solid var(--accent)",
+          padding: "1rem 0",
           overflow: "hidden",
-          zIndex: 100,
-          direction: "rtl", // Correct RTL direction for Arabic context
-          boxShadow: "0 -10px 50px rgba(0,0,0,0.6)"
+          zIndex: 1000,
+          direction: "rtl",
+          boxShadow: "0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(251, 191, 36, 0.1)"
         }}
       >
         <div className="ticker-inner" style={{
           display: "flex",
           width: "max-content",
-          animation: "ticker-rtl 38s linear infinite",
-          fontSize: "2.2rem",
-          fontWeight: 850,
-          color: "white"
+          animation: "ticker-rtl 45s linear infinite",
+          fontSize: "1.8rem",
+          fontWeight: 800,
+          color: "white",
+          letterSpacing: "0.02em"
         }}>
           {/* We repeat the content to create a seamless loop */}
           {[1, 2, 3].map((loop) => (
-            <div key={loop} style={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
+            <div key={loop} style={{ display: "flex", alignItems: "center" }}>
               {tickerMessages.map((msg, i) => (
-                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem" }}>
-                  {msg}
-                  <span style={{ color: "var(--accent)", fontSize: "2.5rem" }}>★</span>
+                <span key={i} style={{ padding: "0 4rem", display: "flex", alignItems: "center", gap: "2.5rem", whiteSpace: "nowrap" }}>
+                  <span style={{ color: "rgba(255,255,255,0.95)" }}>{msg}</span>
+                  <span style={{ 
+                    color: "var(--accent)", 
+                    fontSize: "2rem",
+                    filter: "drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))"
+                  }}>★</span>
                 </span>
               ))}
             </div>
@@ -257,7 +260,7 @@ export default function TVPage() {
           }
           @keyframes ticker-rtl {
             0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(33.33%, 0, 0); }
+            100% { transform: translate3d(33.333%, 0, 0); }
           }
         `}</style>
       </div>
