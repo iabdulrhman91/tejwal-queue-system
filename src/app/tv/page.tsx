@@ -203,7 +203,7 @@ export default function TVPage() {
         </section>
       </div>
 
-      {/* Scrolling Ad Ticker (Seamless Infinite Loop Fix) */}
+      {/* Scrolling Ad Ticker (Seamless RTL Loop) */}
       <div 
         style={{ 
           position: "fixed", 
@@ -216,21 +216,21 @@ export default function TVPage() {
           padding: "1.2rem 0",
           overflow: "hidden",
           zIndex: 100,
-          direction: "ltr", // Force LTR for the ticker logic to be consistent
+          direction: "rtl", // Correct RTL direction for Arabic context
           boxShadow: "0 -10px 50px rgba(0,0,0,0.6)"
         }}
       >
         <div className="ticker-inner" style={{
           display: "flex",
           width: "max-content",
-          animation: "ticker-infinite 60s linear infinite",
+          animation: "ticker-rtl 60s linear infinite",
           fontSize: "2.2rem",
           fontWeight: 850,
           color: "white"
         }}>
           {/* We repeat the content to create a seamless loop */}
           {[1, 2, 3].map((loop) => (
-            <div key={loop} style={{ display: "flex", alignItems: "center" }}>
+            <div key={loop} style={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
               {[
                 "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
                 "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
@@ -239,7 +239,7 @@ export default function TVPage() {
                 "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
                 "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
               ].map((msg, i) => (
-                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem", direction: "rtl" }}>
+                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem" }}>
                   {msg}
                   <span style={{ color: "var(--accent)", fontSize: "2.5rem" }}>★</span>
                 </span>
@@ -251,9 +251,9 @@ export default function TVPage() {
           .ticker-inner {
             will-change: transform;
           }
-          @keyframes ticker-infinite {
+          @keyframes ticker-rtl {
             0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-33.33%, 0, 0); }
+            100% { transform: translate3d(33.33%, 0, 0); }
           }
         `}</style>
       </div>
