@@ -203,49 +203,56 @@ export default function TVPage() {
         </section>
       </div>
 
-      {/* Scrolling Ad Ticker */}
+      {/* Scrolling Ad Ticker (Seamless Infinite Loop) */}
       <div 
         style={{ 
           position: "fixed", 
           bottom: 0, 
           left: 0, 
           right: 0, 
-          background: "rgba(0,0,0,0.85)", 
-          backdropFilter: "blur(15px)",
-          borderTop: "3px solid var(--accent)",
+          background: "rgba(0,0,0,0.92)", 
+          backdropFilter: "blur(20px)",
+          borderTop: "4px solid var(--accent)",
           padding: "1.2rem 0",
           overflow: "hidden",
-          whiteSpace: "nowrap",
           zIndex: 100,
-          boxShadow: "0 -10px 40px rgba(0,0,0,0.5)"
+          boxShadow: "0 -10px 50px rgba(0,0,0,0.6)"
         }}
       >
-        <div style={{
-          display: "inline-block",
-          paddingLeft: "100%",
-          animation: "ticker 40s linear infinite",
-          fontSize: "2rem",
-          fontWeight: 800,
+        <div className="ticker-container" style={{
+          display: "flex",
+          width: "max-content",
+          animation: "ticker-seamless 60s linear infinite",
+          fontSize: "2.2rem",
+          fontWeight: 850,
           color: "white"
         }}>
-          {[
-            "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
-            "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
-            "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
-            "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
-            "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
-            "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
-          ].map((msg, i) => (
-            <span key={i} style={{ margin: "0 4rem" }}>
-              {msg}
-              <span style={{ marginLeft: "4rem", color: "var(--accent)" }}>●</span>
-            </span>
+          {/* We repeat the content twice to create a seamless loop */}
+          {[1, 2].map((loop) => (
+            <div key={loop} style={{ display: "flex", alignItems: "center" }}>
+              {[
+                "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
+                "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
+                "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
+                "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
+                "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
+                "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
+              ].map((msg, i) => (
+                <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem" }}>
+                  {msg}
+                  <span style={{ color: "var(--accent)", fontSize: "2.5rem" }}>★</span>
+                </span>
+              ))}
+            </div>
           ))}
         </div>
         <style jsx>{`
-          @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
+          .ticker-container {
+            will-change: transform;
+          }
+          @keyframes ticker-seamless {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
           }
         `}</style>
       </div>
