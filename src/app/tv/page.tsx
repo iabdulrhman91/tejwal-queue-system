@@ -202,6 +202,53 @@ export default function TVPage() {
           </div>
         </section>
       </div>
+
+      {/* Scrolling Ad Ticker */}
+      <div 
+        style={{ 
+          position: "fixed", 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          background: "rgba(0,0,0,0.85)", 
+          backdropFilter: "blur(15px)",
+          borderTop: "3px solid var(--accent)",
+          padding: "1.2rem 0",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          zIndex: 100,
+          boxShadow: "0 -10px 40px rgba(0,0,0,0.5)"
+        }}
+      >
+        <div style={{
+          display: "inline-block",
+          paddingLeft: "100%",
+          animation: "ticker 40s linear infinite",
+          fontSize: "2rem",
+          fontWeight: 800,
+          color: "white"
+        }}>
+          {[
+            "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
+            "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
+            "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
+            "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
+            "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
+            "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
+          ].map((msg, i) => (
+            <span key={i} style={{ margin: "0 4rem" }}>
+              {msg}
+              <span style={{ marginLeft: "4rem", color: "var(--accent)" }}>●</span>
+            </span>
+          ))}
+        </div>
+        <style jsx>{`
+          @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+          }
+        `}</style>
+      </div>
     </main>
   );
 }
