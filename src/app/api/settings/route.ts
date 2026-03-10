@@ -32,8 +32,16 @@ export async function GET() {
         }
       });
     }
-    
-    return NextResponse.json(settings);
+
+    const tickerMessages = (process.env.TICKER_MESSAGES || process.env.NEXT_PUBLIC_TICKER_MESSAGES || "")
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s !== "");
+
+    return NextResponse.json({
+      ...settings,
+      tickerMessages: tickerMessages.length > 0 ? tickerMessages : null
+    });
   } catch (error: any) {
     console.error("Settings GET Error:", error);
     return NextResponse.json({ 
