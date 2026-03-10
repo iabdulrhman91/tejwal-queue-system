@@ -234,7 +234,7 @@ export default function TVPage() {
         <div className="ticker-inner" style={{
           display: "flex",
           width: "max-content",
-          animation: "ticker-rtl 60s linear infinite",
+          animation: "ticker-rtl 40s linear infinite",
           fontSize: "2.2rem",
           fontWeight: 850,
           color: "white"
