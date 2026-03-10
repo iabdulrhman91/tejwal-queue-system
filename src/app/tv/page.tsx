@@ -103,6 +103,20 @@ export default function TVPage() {
   const waitingNext = waitingList.slice(0, 5);
   const totalWaiting = waitingList.length;
 
+  // Dynamic Ticker Messages from Environment Variables
+  const defaultMessages = [
+    "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
+    "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
+    "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
+    "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
+    "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
+    "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
+  ];
+  
+  const tickerMessages = process.env.NEXT_PUBLIC_TICKER_MESSAGES 
+    ? process.env.NEXT_PUBLIC_TICKER_MESSAGES.split(';') 
+    : defaultMessages;
+
   return (
     <main className="tv-display">
       <audio ref={audioRef} src={bellUrl} preload="auto" />
@@ -231,14 +245,7 @@ export default function TVPage() {
           {/* We repeat the content to create a seamless loop */}
           {[1, 2, 3].map((loop) => (
             <div key={loop} style={{ display: "flex", alignItems: "center", flexDirection: "row" }}>
-              {[
-                "✨ أهلاً بكم في مكتبنا لخدمات التأشيرات وبصمة الشنغن .. نسعد بخدمتكم دائماً",
-                "📞 للتواصل والاستفسار عبر الواتساب: 9665XXXXXXXX",
-                "🌍 خدماتنا: استخراج تأشيرات الشنغن، حجز مواعيد البصمة، تأمين سياحي دولي، ترجمة معتمدة",
-                "📜 تنبيه: يرجى التأكد من صلاحية جواز السفر لأكثر من 6 أشهر قبل التقديم",
-                "✈️ نوفر لكم باقات سياحية متكاملة وحجوزات طيران وفنادق بأسعار منافسة",
-                "💡 نصيحة: يرجى إحضار أصل الهوية وجواز السفر عند مراجعة الموظف لتسريع الإجراءات"
-              ].map((msg, i) => (
+              {tickerMessages.map((msg, i) => (
                 <span key={i} style={{ padding: "0 5rem", display: "flex", alignItems: "center", gap: "5rem" }}>
                   {msg}
                   <span style={{ color: "var(--accent)", fontSize: "2.5rem" }}>★</span>
