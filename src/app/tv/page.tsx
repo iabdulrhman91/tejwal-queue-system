@@ -20,10 +20,18 @@ export default function TVPage() {
       const res = await fetch(`/api/settings?t=${Date.now()}`, { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
+        console.log("Settings fetched:", data); // Debug log
         if (data.bellUrl) setBellUrl(data.bellUrl);
-        if (data.tickerMessages) setTickerMessages(data.tickerMessages);
-        else setTickerMessages([]); // Reset to empty if no messages defined in ENV
+        if (data.tickerMessages) {
+          console.log("Setting ticker messages:", data.tickerMessages);
+          setTickerMessages(data.tickerMessages);
+        } else {
+          console.log("No ticker messages found");
+          setTickerMessages([]); // Reset to empty if no messages defined in ENV
+        }
         if (data.tickerSpeed) setTickerSpeed(data.tickerSpeed);
+      } else {
+        console.error("Settings fetch failed with status:", res.status);
       }
 
     } catch (err) {

@@ -3,23 +3,28 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
+
   // Define sensitive paths:
   // 1. Exactly '/' (The Dashboard)
-  // 2. All settings APIs (/api/settings)
+  // 2. Settings APIs - but only protect PATCH/POST/DELETE, allow GET for public display
   const isDashboard = pathname === "/";
   const isSettingsApi = pathname.startsWith("/api/settings");
-  
-  if (isDashboard || isSettingsApi) {
+
+  if (isDashboard) {
     const authCookie = request.cookies.get("auth_token")?.value;
-    
+
     // Check if the cookie is 'valid_session_token'
     if (authCookie !== "valid_session_token") {
-      // If it's the dashboard UI, redirect to /login
-      if (isDashboard) {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
-      // If it's a settings API call, return 401 Unauthorized
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  // For settings API: only protect write operations (PATCH, POST, DELETE)
+  if (isSettingsApi && (request.method === "PATCH" || request.method === "POST" || request.method === "DELETE")) {
+    const authCookie = request.cookies.get("auth_token")?.value;
+
+    // Check if the cookie is 'valid_session_token'
+    if (authCookie !== "valid_session_token") {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
     }
   }
