@@ -54,6 +54,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params;
     const { status } = await req.json();
 
+    // Check current status BEFORE updating
+    const current = await prisma.queueItem.findUnique({
+      where: { id: parseInt(id) },
+    });
+
     const updated = await prisma.queueItem.update({
       where: {
         id: parseInt(id),
@@ -64,28 +69,49 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
     });
 
-    // Webhook Trigger: If status is CALLED, check for webhook URL
-    if (status === "CALLED") {
+    // Webhook only when status changes from WAITING to CALLED (not re-notify)
+    if (status === "CALLED" && current?.status === "WAITING") {
       try {
         // @ts-ignore
         const settings = await prisma.settings.findFirst();
         if (settings?.webhookUrl) {
           console.log("Triggering Webhook:", settings.webhookUrl);
-          fetch(settings.webhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              event: "CUSTOMER_CALLED",
-              customer: {
-                id: updated.id,
-                name: updated.name,
-                phone: updated.phone,
-                queueNumber: updated.queueNumber,
-                status: updated.status
-              },
-              timestamp: new Date().toISOString()
-            })
-          }).catch(err => console.error("Webhook Fetch Error:", err));
+          // Get today's date
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          // Find the 6th person waiting in the queue
+          const sixthInLine = await prisma.queueItem.findMany({
+            where: {
+              status: "WAITING",
+              createdAt: { gte: today },
+            },
+            orderBy: { createdAt: "asc" },
+            skip: 5,
+            take: 1,
+          });
+
+          if (sixthInLine.length > 0) {
+            const nextCustomer = sixthInLine[0];
+            console.log(`[Webhook] Notifying 6th in line: ${nextCustomer.name} (${nextCustomer.queueNumber})`);
+            fetch(settings.webhookUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                event: "CUSTOMER_UPCOMING",
+                customer: {
+                  id: nextCustomer.id,
+                  name: nextCustomer.name,
+                  phone: nextCustomer.phone,
+                  queueNumber: nextCustomer.queueNumber,
+                  status: nextCustomer.status
+                },
+                timestamp: new Date().toISOString()
+              })
+            }).catch(err => console.error("Webhook Fetch Error:", err));
+          } else {
+            console.log("[Webhook] No 6th person in queue to notify");
+          }
         }
       } catch (webhookErr) {
         console.error("Webhook Trigger Error:", webhookErr);
