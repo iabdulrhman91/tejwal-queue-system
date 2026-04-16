@@ -87,7 +87,8 @@ export async function POST(req: Request) {
               name: item.name,
               phone: item.phone,
               queueNumber: item.queueNumber,
-              status: item.status
+              status: item.status,
+              ticketUrl: `${new URL(req.url).origin}/ticket/${item.id}`
             },
             timestamp: new Date().toISOString()
           })

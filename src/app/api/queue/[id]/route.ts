@@ -38,10 +38,23 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       },
     });
 
-    return NextResponse.json({ 
-      ...item, 
+    const totalToday = await prisma.queueItem.count({
+      where: { createdAt: { gte: today } },
+    });
+
+    const doneToday = await prisma.queueItem.count({
+      where: {
+        createdAt: { gte: today },
+        status: { in: ["DONE", "CALLED"] },
+      },
+    });
+
+    return NextResponse.json({
+      ...item,
       nowServing: nowServing?.queueNumber || "--",
-      waitingCount 
+      waitingCount,
+      totalToday,
+      doneToday,
     });
   } catch (error: any) {
     console.error("Queue Detail API Error:", error);
@@ -104,7 +117,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                   name: nextCustomer.name,
                   phone: nextCustomer.phone,
                   queueNumber: nextCustomer.queueNumber,
-                  status: nextCustomer.status
+                  status: nextCustomer.status,
+                  ticketUrl: `${new URL(req.url).origin}/ticket/${nextCustomer.id}`
                 },
                 timestamp: new Date().toISOString()
               })
