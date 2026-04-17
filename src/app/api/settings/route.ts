@@ -3,6 +3,14 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+function normalizeMaxDistance(value: unknown) {
+  const parsed = Number.parseInt(String(value), 10);
+  if (Number.isNaN(parsed)) return 500;
+
+  // Keep the geofence within a sensible local-office range and inside Int bounds.
+  return Math.min(Math.max(parsed, 10), 100000);
+}
+
 export async function GET() {
   try {
     // Auto-Migration for Production: Add isOpen column if it doesn't exist
@@ -69,7 +77,7 @@ export async function PATCH(req: Request) {
     
     const lat = isNaN(parseFloat(data.officeLat)) ? 24.7136 : parseFloat(data.officeLat);
     const lng = isNaN(parseFloat(data.officeLng)) ? 46.6753 : parseFloat(data.officeLng);
-    const dist = isNaN(parseInt(data.maxDistance)) ? 500 : parseInt(data.maxDistance);
+    const dist = normalizeMaxDistance(data.maxDistance);
     const bell = data.bellUrl || "https://assets.mixkit.co/active_storage/sfx/2855/2855-preview.mp3";
     const web = data.webhookUrl || "";
     // Handle isOpen correctly

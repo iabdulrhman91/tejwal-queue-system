@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAppUrl } from "@/lib/app-url";
 
 export const dynamic = "force-dynamic";
 
@@ -118,7 +119,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                   phone: nextCustomer.phone,
                   queueNumber: nextCustomer.queueNumber,
                   status: nextCustomer.status,
-                  ticketUrl: `${new URL(req.url).origin}/ticket/${nextCustomer.id}`
+                  ticketUrl: `${getAppUrl(req)}/ticket/${nextCustomer.id}`
                 },
                 timestamp: new Date().toISOString()
               })

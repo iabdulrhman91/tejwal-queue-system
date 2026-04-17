@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateNextQueueNumber, checkPhoneRegistration } from "@/lib/queue-helpers";
+import { getAppUrl } from "@/lib/app-url";
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
               phone: item.phone,
               queueNumber: item.queueNumber,
               status: item.status,
-              ticketUrl: `${new URL(req.url).origin}/ticket/${item.id}`
+              ticketUrl: `${getAppUrl(req)}/ticket/${item.id}`
             },
             timestamp: new Date().toISOString()
           })
